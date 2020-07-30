@@ -1,4 +1,4 @@
-### 一.flask路有本质 ###
+### 一.flask路由本质 ###
 `flask`装饰器路由的简单使用        --(1)
 ```python
 from flask import Flask
