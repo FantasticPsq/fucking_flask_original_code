@@ -20,10 +20,10 @@ def route(self, rule, **options):
 ```
 `route`装饰器分析
 ```text
-self=app,rule="/",options={methods:["POST"],endpoint="in"
+self=app,rule="/",options={methods:["POST"]},endpoint="in"
 route装饰器返回decorator函数，decorator的参数f(function)即为index函数
 也就是@app.route("/", methods=["POST"], endpoint="in") =>
-@decorator => decorator(index)=> app.add_url_rule(rule,endpoint,f,**options)
+@decorator => decorator(index)=> app.add_url_rule(rule,endpoint,index,methods=["POST"])
 ```
 也就是代码段(1)等价于：
 ```python
@@ -53,7 +53,7 @@ class View(object):
         def view(*args, **kwargs):
             # view.view_class即为cls，这里是实例化cls对象
             self = view.view_class(*class_args, **class_kwargs)
-            # dispatch_request(发送请求)后面做详细讲解
+            # dispatch_request(分配新的请求工作线程)后面做详细讲解
             return self.dispatch_request(*args, **kwargs)
         # decorators是装饰器列表,比如decorators = [login_required,admin_required]
         if cls.decorators: 
@@ -88,3 +88,4 @@ def dispatch_request(self, *args, **kwargs):
     #执行请求对应的方法
     return meth(*args, **kwargs)
 ```
+可以看出flask的路由很多地方和django是相似的。
