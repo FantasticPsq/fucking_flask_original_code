@@ -88,4 +88,56 @@ def dispatch_request(self, *args, **kwargs):
     #执行请求对应的方法
     return meth(*args, **kwargs)
 ```
-可以看出flask的路由很多地方和django是相似的。
+可以看出flask的路由很多地方和django是相似的。  
+通过上面的分析，注册路由最重要的函数便是`add_url_rule`,咋们来看一下其源代码：
+```python
+# setupmethod启动检查装饰器，检查debug模式与是否是第一次请求
+@setupmethod
+def add_url_rule(self, rule, endpoint=None, view_func=None,
+                 provide_automatic_options=None, **options):
+    # 设置别名
+    if endpoint is None:
+        endpoint = _endpoint_from_view_func(view_func)
+    options['endpoint'] = endpoint
+    
+    #设置请求方法
+    methods = options.pop('methods', None)
+    # if the methods are not given and the view_func object knows its
+    # methods we can use that instead.  If neither exists, we go with
+    # a tuple of only ``GET`` as default.
+    if methods is None:
+        methods = getattr(view_func, 'methods', None) or ('GET',)
+    if isinstance(methods, string_types):
+        raise TypeError('Allowed methods have to be iterables of strings, '
+                        'for example: @app.route(..., methods=["POST"])')
+    methods = set(item.upper() for item in methods)
+    # Methods that should always be added
+    required_methods = set(getattr(view_func, 'required_methods', ()))
+    # starting with Flask 0.8 the view_func object can disable and
+    # force-enable the automatic options handling.
+    #是否允许options预检查
+    if provide_automatic_options is None:
+        provide_automatic_options = getattr(view_func,
+            'provide_automatic_options', None)
+    if provide_automatic_options is None:
+        if 'OPTIONS' not in methods:
+            provide_automatic_options = True
+            required_methods.add('OPTIONS')
+        else:
+            provide_automatic_options = False
+    # Add the required methods now.
+    methods |= required_methods
+    #实例化Rule对象，因为url_rule_class=Rule
+    rule = self.url_rule_class(rule, methods=methods, **options)
+    rule.provide_automatic_options = provide_automatic_options
+    
+    # Flask.url_map中添加实例化后的Rule对象
+    self.url_map.add(rule)
+    #判断视图函数是否重复
+    if view_func is not None:
+        old_func = self.view_functions.get(endpoint)
+        if old_func is not None and old_func != view_func:
+            raise AssertionError('View function mapping is overwriting an '
+                                 'existing endpoint function: %s' % endpoint)
+        self.view_functions[endpoint] = view_func
+```
