@@ -52,8 +52,10 @@ class local:
         with _patch(self):
             return object.__delattr__(self, name)
 ```
-上面的代码中有个非常重要的枷锁操作_patch,其源代码如下：
+上面的代码中有个非常重要的加锁操作_patch,其源代码如下：
 ```python
+# contextmanager上下文管理器，封装了__enter__和__exit__，用于生成简便的with语句
+# 如with open就可以用contextmanager实现
 @contextmanager
 def _patch(self):
     #获取对应local的实现类

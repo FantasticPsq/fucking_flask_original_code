@@ -23,12 +23,12 @@ app.add_url_rule("/greet", endpoint="greeting", methods=["GET"], view_func=greet
 class HelloView(views.MethodView):
     def __init__(self):
         self.hello = "hello"
+
     decorators = []
 
     def get(self):
         print(self.__dict__)
         return "hello world"
-
 
 
 app.add_url_rule("/hello", view_func=HelloView.as_view(name="hello"))
