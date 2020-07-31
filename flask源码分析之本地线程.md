@@ -10,7 +10,7 @@ class local:
     __slots__ = '_local__impl', '__dict__'
     # 实例化对象的方法，优先于初始化函数__init__被执行
     def __new__(cls, *args, **kw):
-        # loval实例化时不能带参数（因为默认采用object的初始化方法），如果带了参数必须使用自己的初始化函数进行初始化
+        # local实例化时不能带参数（因为默认采用object的初始化方法），如果带了参数必须使用自己的初始化函数进行初始化
         if (args or kw) and (cls.__init__ is object.__init__):
             raise TypeError("Initialization arguments are not supported")
         # 实例化 object对象
@@ -51,5 +51,25 @@ class local:
                 % self.__class__.__name__)
         with _patch(self):
             return object.__delattr__(self, name)
+```
+上面的代码中有个非常重要的枷锁操作_patch,其源代码如下：
+```python
+@contextmanager
+def _patch(self):
+    #获取对应local的实现类
+    impl = object.__getattribute__(self, '_local__impl')
+    try:
+        # 获取impl在local中生成的dict(impl.create_dict())
+        dct = impl.get_dict()
+    except KeyError:
+        dct = impl.create_dict()
+        args, kw = impl.localargs
+        self.__init__(*args, **kw)
+    with impl.locallock:
+        # 注意此处不能写self.__dict__ = dct,因为__dict__不可写
+        # 所以只能使用object的set方法进行初始化
+        object.__setattr__(self, '__dict__', dct)
+        # 生成器等待执行结果
+        yield
 ```
 通过上面的分析，大致可以知道，本地线程是通过加锁进行隔离的，这是flask实现的多线程的基础。
