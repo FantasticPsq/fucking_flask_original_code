@@ -74,4 +74,62 @@ def _patch(self):
         # 生成器等待执行结果
         yield
 ```
-通过上面的分析，大致可以知道，本地线程是通过加锁进行隔离的，这是flask实现的多线程的基础。
+通过上面的分析，大致可以知道，本地线程是通过加锁进行隔离的，这是flask实现的多线程的基础。  
+那么问题来了，python里面是有协程的，local能否实现协程的隔离呢？答案是否。那么，该怎么实现对协程的支持呢？  
+请看Local类的源代码：
+```python
+# 此处导入便实现了协程的支持，如果导入getcurrent成功便支持协程，否则只支持多线程
+try:
+    from greenlet import getcurrent as get_ident
+except ImportError:
+    try:
+        from thread import get_ident
+    except ImportError:
+        from _thread import get_ident
+
+class Local(object):
+    # 限制Local的属性
+    __slots__ = ('__storage__', '__ident_func__')
+    
+    # 初始化Local的属性
+    def __init__(self):
+        # __storage__的格式为：{ID:{name:value},}
+        # __storage__实际存储的值为：{ID:{'stack':[RequestContext(),],}
+        object.__setattr__(self, '__storage__', {})
+        # __ident_func__记录协程/线程的唯一ID
+        object.__setattr__(self, '__ident_func__', get_ident)
+
+    def __iter__(self):
+        # Local可迭代
+        return iter(self.__storage__.items())
+
+    def __call__(self, proxy):
+        """Create a proxy for a name."""
+        return LocalProxy(self, proxy)
+
+    def __release_local__(self):
+        # 释放协程/线程
+        self.__storage__.pop(self.__ident_func__(), None)
+    
+    # get方法，获取协程/线程的信息
+    def __getattr__(self, name):
+        try:
+            return self.__storage__[self.__ident_func__()][name]
+        except KeyError:
+            raise AttributeError(name)
+    # set方法，保存协程/线程信息
+    def __setattr__(self, name, value):
+        ident = self.__ident_func__()
+        storage = self.__storage__
+        try:
+            storage[ident][name] = value
+        except KeyError:
+            storage[ident] = {name: value}
+    # delete方法, 删除协程/线程信息
+    def __delattr__(self, name):
+        try:
+            del self.__storage__[self.__ident_func__()][name]
+        except KeyError:
+            raise AttributeError(name)
+```
+其实无论线程还是协程，最重要的是唯一ID,只要获取并保存了唯一ID,就可获取相应的信息，从而执行相应的程序。  

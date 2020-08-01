@@ -1,6 +1,6 @@
 import threading
 
-from flask import Flask
+from flask import Flask, request
 from flask import views
 
 app = Flask(__name__)
@@ -33,4 +33,6 @@ class HelloView(views.MethodView):
 
 app.add_url_rule("/hello", view_func=HelloView.as_view(name="hello"))
 if __name__ == '__main__':
+    app.__call__
+    app.request_class
     app.run(port=8080)
