@@ -25,11 +25,14 @@ def __call__(self, environ, start_response):
 Flask.wsgi_app(environ,start_response)
 ```python
 def wsgi_app(self,environ,start_response):
+    #实例化RequestContext对象
     ctx = self.request_context(environ)
     error = None
     try:
         try:
+            # 将ctx加入到Local.stack中
             ctx.push()
+            # 寻找视图函数并执行，结果返回给response
             response = self.full_dispatch_request()
         except Exception as e:
             error = e
