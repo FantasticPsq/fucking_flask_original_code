@@ -27,6 +27,7 @@ class HelloView(views.MethodView):
     decorators = []
 
     def get(self):
+        print(request)
         print(self.__dict__)
         return "hello world"
 

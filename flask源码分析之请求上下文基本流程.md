@@ -15,3 +15,6 @@ response = self.full_dispatch_request() -> rv = self.preprocess_request() -> rv 
 第三阶段，请求结束：
 ctx.auto_pop(error) -> _request_ctx_stack.pop()-> stack.pop()，一个请求完成后从stack中删除，注意stack是list。
 ```
+流程是非常重要的，先把流程基本弄明白才可能把flask上下文搞清楚；  
+接下来，源码分析请看：flask源码分析之请求上下文第一阶段
+
