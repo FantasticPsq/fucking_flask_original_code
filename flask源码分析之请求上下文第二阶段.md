@@ -112,11 +112,11 @@ def preprocess_request(self):
         # self.url_value_preprocessors获取蓝图的所有url_value_preprocessor函数
         # chain将列表或者元组进行连接
         funcs = chain(funcs, self.url_value_preprocessors[bp])
-    # 一次执行所有url_value_preprocessor函数
+    # 依次执行所有url_value_preprocessor函数
     for func in funcs:
         func(request.endpoint, request.view_args)
     # 获取app对应的所有的before_request函数
-    #需要注意的是，before_request_funcs是字典，而before_first_request_funcs是列表
+    # 需要注意的是，before_request_funcs是字典，而before_first_request_funcs是列表
     funcs = self.before_request_funcs.get(None, ())
     if bp is not None and bp in self.before_request_funcs:
         # self.before_request_funcs[bp]获取蓝图对应的所有的before_request函数
@@ -146,7 +146,7 @@ def dispatch_request(self):
     req = _request_ctx_stack.top.request
     if req.routing_exception is not None:
         self.raise_routing_exception(req)
-    #获取请求的url_rule，路由规则
+    # 获取请求的url_rule，路由规则
     rule = req.url_rule
     # if we provide automatic options for this URL and the
     # request came with the OPTIONS method, reply automatically
@@ -155,7 +155,7 @@ def dispatch_request(self):
         return self.make_default_options_response()
     # otherwise dispatch to the handler for that endpoint
     # 从路由本质一文中可知所有的视图函数都会被注册到view_functions这个字典中
-    # 现在更具endpoint获取对应的视图函数进而执行视图函数
+    # 现在根据endpoint获取对应的视图函数进而执行视图函数
     return self.view_functions[rule.endpoint](**req.view_args)
 ```
 self.finalize_request(rv)：
@@ -164,7 +164,7 @@ def finalize_request(self, rv, from_error_handler=False):
     # 封装视图函数返回的数据
     response = self.make_response(rv)
     try:
-        # 处理response
+        # 执行after_request函数
         response = self.process_response(response)
         request_finished.send(self, response=response)
     except Exception:
