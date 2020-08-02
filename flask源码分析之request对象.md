@@ -7,7 +7,7 @@ from flask import request
 ```python
 request = LocalProxy(partial(_lookup_req_object, 'request'))
 ```
-此处涉及到偏函数partial,对partial不了解的请看  [偏函数.py]() 文件  
+此处涉及到偏函数partial,对partial不了解的请看  [偏函数.py](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/%E5%81%8F%E5%87%BD%E6%95%B0.py) 文件  
 由于实例化了LocalProxy类，调用`LocalProxy.__init__`方法
 ```python
 __slots__ = ('__local', '__dict__', '__name__', '__wrapped__')
