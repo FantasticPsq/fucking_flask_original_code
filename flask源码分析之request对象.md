@@ -58,6 +58,6 @@ def _lookup_req_object(name):
     # 从之前的分析可知，ctx的request其实是一个Request实例化对象
     return getattr(top, name)
 ```
-综合上面的分析可知，flask.request虽然是一个LocalProxy对象，但是其最终是一个Request对象  
+综合上面的分析可知，flask.request虽然是一个LocalProxy对象，但是其最终使用的是一个Request对象  
 LocalProxy只是做了一个代理  
 提问：代理模式有什么好处？
