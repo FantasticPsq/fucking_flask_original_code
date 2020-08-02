@@ -7,3 +7,4 @@
 4. [flask源码分析之请求上下文第一阶段](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/flask%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5.md)
 5. [flask源码分析之请求上下文第二阶段](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/flask%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5.md) 
 6. [flask源码分析之请求上下文第三阶段](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/flask%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AC%AC%E4%B8%89%E9%98%B6%E6%AE%B5.md)
+7. [flask源码分析之request对象](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/flask%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Brequest%E5%AF%B9%E8%B1%A1.md)
