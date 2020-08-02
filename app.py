@@ -1,5 +1,5 @@
 import threading
-from flask import signals, make_response
+from flask import signals, make_response, request
 
 from flask import Flask, request
 from flask import views
@@ -82,5 +82,6 @@ with app.app_context():
     print("hello")
 
 if __name__ == '__main__':
+    app.request_class
     app.register_blueprint(bp)
     app.run(port=8080, debug=True)
