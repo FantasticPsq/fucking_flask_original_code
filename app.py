@@ -1,5 +1,5 @@
 import threading
-from flask import signals
+from flask import signals, make_response
 
 from flask import Flask, request
 from flask import views
@@ -62,15 +62,25 @@ app.add_url_rule("/hello", view_func=HelloView.as_view(name="hello"))
 
 
 @app.after_request
-def after_request(*args, **kwargs):
+def after_request(response):
     print("app中第一个请求之后的处理")
+    return make_response(response)
 
 
 @app.after_request
-def after_request2(*args, **kwargs):
+def after_request2(response):
     print("app中第二个请求之后的处理")
+    return make_response(response)
 
+
+@app.teardown_request
+def teardown_request(*args, **kwargs):
+    print("从请求上下文栈中删除本次请求对应的RequestContext")
+
+
+with app.app_context():
+    print("hello")
 
 if __name__ == '__main__':
     app.register_blueprint(bp)
-    app.run(port=8080)
+    app.run(port=8080, debug=True)

@@ -11,6 +11,8 @@ def run(args):
         # reset the first request information if the development server
         # reset normally.  This makes it possible to restart the server
         # without reloader and that stuff from an interactive shell.
+        # 启动时将_got_first_request设置为false,_got_first_request是用来
+        # 标志@app.before_first_request装饰的函数（后面简称before_first_request函数)是否执行完毕
         self._got_first_request = False
 ```
 `Flask.__call__`
@@ -79,19 +81,22 @@ def push(self):
     top = _request_ctx_stack.top
     if top is not None and top.preserved:
         top.pop(top._preserved_exc)
-    # Before we push the request context we have to ensure that there
-    # is an application context.
+    # 在添加请求上下文之前必须确保有一个应用上下文
     app_ctx = _app_ctx_stack.top
+    # 如果app_ctx为空或者app_ctx.app不是当前app(多app应用中会出现），就实例化一个AppContext对象
+    # 并将其加入到AppContext的Local的stack中,同时_implicit_app_ctx_stack添加新创建的app_ctx
+    # 如果app_ctx已经有了，那么则不存在被隐式创建的app_ctx,所以_implicit_app_ctx_stack.append(None)
     if app_ctx is None or app_ctx.app != self.app:
         app_ctx = self.app.app_context()
         app_ctx.push()
+        # _implicit_app_ctx_stack是个列表
         self._implicit_app_ctx_stack.append(app_ctx)
     else:
         self._implicit_app_ctx_stack.append(None)
 
     if hasattr(sys, 'exc_clear'):
         sys.exc_clear()
-
+    # 添加请求上下文
     _request_ctx_stack.push(self)
 ```
 _request_ctx_stack.top  
@@ -180,7 +185,12 @@ def __setattr__(self, name, value):
         storage[ident] = {name: value}
 # 执行上述操作之后__storage__存储的内容为 {ident:{'stack':[ctx,]}
 ```
-以上是第一阶段的基本流程，其中需要重点把握的__storage__以及_request_ctx_stack。
+以上是第一阶段的基本流程，其中需要重点把握的__storage__以及_request_ctx_stack。  
+疑惑解答（这是我自己看的时候的疑惑，可能其他同学也会有这种疑惑）：
+1. 何为隐式创建的app_ctx(应用上下文)? 答：是指flask自动实例化并添加到_app_ctx_stack中的app_ctx
+2. 什么时候会显示创建app_ctx? 答：我们在代码中使用with app.app_context()时会显示创建一个app_ctx,  
+这个app_ctx会被自动加入到_app_ctx_stack(with语句请看AppContext类的`__enter__`和`__exit__`方法),  
+但是不会被加到_implicit_app_ctx_stack
 第一阶段提问：  
 1. flask如何处理的多线程？
 2. Local的stack为什么是一个列表？不是一般一个请求对应一个独立线程吗？一个独立

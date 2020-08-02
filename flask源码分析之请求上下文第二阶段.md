@@ -1,4 +1,33 @@
 接下来，我们来看一看第二阶段请求处理部分的相关源码：
+先把总函数粘贴出来：
+```python
+def wsgi_app(self,environ,start_response):
+    # 第一阶段
+    # 实例化RequestContext对象
+    ctx = self.request_context(environ)
+    error = None
+    try:
+        try:
+            # 第一阶段
+            # 将ctx加入到Local.stack中
+            ctx.push()
+            # 第二阶段
+            # 寻找视图函数并执行，结果返回给response
+            response = self.full_dispatch_request()
+        except Exception as e:
+            error = e
+            response = self.handle_exception(e)
+        except:
+            error = sys.exc_info()[1]
+            raise
+        # 注意由于返回的response进行实例化了，所以返回的response必须是Response对象
+        return response(environ, start_response)
+    finally:
+        if self.should_ignore_error(error):
+            error = None
+        # 第三阶段
+        ctx.auto_pop(error)
+```
 Flask.full_dispatch_request，其作用为请求预处理和捕获和处理相关错误
 ```python
 def full_dispatch_request(self):
@@ -161,7 +190,7 @@ def dispatch_request(self):
 self.finalize_request(rv)：
 ```python
 def finalize_request(self, rv, from_error_handler=False):
-    # 封装视图函数返回的数据
+    # 封装视图函数返回的数据为一个Response对象
     response = self.make_response(rv)
     try:
         # 执行after_request函数
@@ -177,18 +206,7 @@ def finalize_request(self, rv, from_error_handler=False):
 process_response
 ```python
 def process_response(self, response):
-    """Can be overridden in order to modify the response object
-    before it's sent to the WSGI server.  By default this will
-    call all the :meth:`after_request` decorated functions.
-
-    .. versionchanged:: 0.5
-       As of Flask 0.5 the functions registered for after request
-       execution are called in reverse order of registration.
-
-    :param response: a :attr:`response_class` object.
-    :return: a new response object or the same, has to be an
-             instance of :attr:`response_class`.
-    """
+    """执行after_request函数"""
     # 获取请求上下文对象
     ctx = _request_ctx_stack.top
     # 获取蓝图对象
@@ -207,7 +225,9 @@ def process_response(self, response):
         # 所以after_request函数的执行顺序为先逆序执行蓝图种after_request函数，然后逆序执行app中after_request函数
         funcs = chain(funcs, reversed(self.after_request_funcs[None]))
     for handler in funcs:
-        # 执行after_request函数
+        # 执行after_request函数，并将response进行封装，返回的必须是Response对象
+        # 所以after_request函数必须返回Response对象，通常可以使用make_response！！！（重点）
+        # 如果after_request返回的不是make_response(response)，那么视图函数返回的值将被覆盖
         response = handler(response)
     # 如果请求上下文的session不为空，则保存session
     if not self.session_interface.is_null_session(ctx.session):
