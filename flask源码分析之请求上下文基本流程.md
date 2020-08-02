@@ -9,8 +9,9 @@ app.run() -> run_simple(host, port, self, **options) -> app.__call__(environ, st
 -> _request_ctx_stack.push(self) -> LocalStack.push(obj) -> Local.__setattr__() 
 
 第二阶段，请求处理：
-response = self.full_dispatch_request() -> rv = self.preprocess_request() -> rv = self.dispatch_request() 
--> self.view_functions[rule.endpoint](**req.view_args)
+response = self.full_dispatch_request() -> self.try_trigger_before_first_request_functions() -> rv = self.preprocess_request() 
+-> rv = self.dispatch_request() -> rv = self.preprocess_request() -> self.finalize_request(rv) ->
+-> response = self.process_response(response) -> self.view_functions[rule.endpoint](**req.view_args)
 
 第三阶段，请求结束：
 ctx.auto_pop(error) -> _request_ctx_stack.pop()-> stack.pop()，一个请求完成后从stack中删除，注意stack是list。

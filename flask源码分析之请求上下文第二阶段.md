@@ -215,4 +215,7 @@ def process_response(self, response):
     return response
 ```
 回到finalize_request继续执行request_finished.send(self, response=response)，  
-触发request_finished信号，请求结束
+触发request_finished信号，请求结束  
+第二阶段遗留问题：
+1. 为什么处理before_first_request函数时需要加锁？而处理before_request函数却不需要？  
+2. RequestContext中为什么也会有after_request函数，它是在哪里定义的？以及它是用来干啥的？

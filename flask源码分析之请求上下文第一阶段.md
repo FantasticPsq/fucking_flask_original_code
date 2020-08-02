@@ -181,3 +181,7 @@ def __setattr__(self, name, value):
 # 执行上述操作之后__storage__存储的内容为 {ident:{'stack':[ctx,]}
 ```
 以上是第一阶段的基本流程，其中需要重点把握的__storage__以及_request_ctx_stack。
+第一阶段提问：  
+1. flask如何处理的多线程？
+2. Local的stack为什么是一个列表？不是一般一个请求对应一个独立线程吗？一个独立
+的线程内不是一般只有一个请求上下文(RequestContext)吗？
