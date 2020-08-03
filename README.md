@@ -9,3 +9,4 @@
 6. [flask源码分析之请求上下文第三阶段](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/flask%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8B%E8%AF%B7%E6%B1%82%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AC%AC%E4%B8%89%E9%98%B6%E6%AE%B5.md)
 7. [flask源码分析之request对象](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/flask%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Brequest%E5%AF%B9%E8%B1%A1.md)
 8. [flask源码分析之session对象](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/flask%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bsession%E5%AF%B9%E8%B1%A1.md)
+9. [flask源码分析之SQLAlchemy数据库连接池](https://github.com/FantasticPsq/fucking_flask_original_code/blob/master/flask%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8BSQLAlchemy%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E6%B1%A0.md)
