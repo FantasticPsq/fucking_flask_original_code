@@ -1,5 +1,6 @@
 import threading
 from flask import signals, make_response, request
+from flask_migrate import Migrate
 
 from flask import Flask, request
 from flask import views
