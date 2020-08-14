@@ -36,9 +36,12 @@ __str__ = lambda x: str(x._get_current_object())
 接下来调用了self._get_current_object():
 ```python
 def _get_current_object(self):
-    # 如果self.__local有__release_local__属性，
+    # 如果self.__local没有__release_local__属性，
+    # 则return self.__local()
+    # 而self.__local() = partial(_lookup_req_object,'request')
     # 则执行偏函数partial(_lookup_req_object, 'request')，
     # 实则是执行了_lookup_req_object('request)
+    # 也就是说最终request被使用时是函数_lookup_req_object('request)的返回值
     if not hasattr(self.__local, '__release_local__'):
         return self.__local()
     try:
@@ -55,7 +58,7 @@ def _lookup_req_object(name):
     if top is None:
         raise RuntimeError(_request_ctx_err_msg)
     # 返回getattr(ctx,'request'),即返回ctx的request属性
-    # 从之前的分析可知，ctx的request其实是一个Request实例化对象
+    # 从之前的markdown file分析可知，ctx的request其实是一个Request实例化对象
     return getattr(top, name)
 ```
 综合上面的分析可知，flask.request虽然是一个LocalProxy对象，但是其最终使用的是一个Request对象  
