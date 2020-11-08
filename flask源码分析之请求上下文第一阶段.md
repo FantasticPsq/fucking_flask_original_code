@@ -191,7 +191,6 @@ def __setattr__(self, name, value):
 2. 什么时候会显示创建app_ctx? 答：我们在代码中使用with app.app_context()时会显示创建一个app_ctx,  
 这个app_ctx会被自动加入到_app_ctx_stack(with语句请看AppContext类的`__enter__`和`__exit__`方法),  
 但是不会被加到_implicit_app_ctx_stack
-第一阶段提问：  
-1. flask如何处理的多线程？
+1. flask如何处理的多线程？  答：stack保存每个线程的信息
 2. Local的stack为什么是一个列表？不是一般一个请求对应一个独立线程吗？一个独立
-的线程内不是一般只有一个请求上下文(RequestContext)吗？
+的线程内不是一般只有一个请求上下文(RequestContext)吗？ 请看问题2.

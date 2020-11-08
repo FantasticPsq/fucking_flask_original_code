@@ -108,7 +108,7 @@ def try_trigger_before_first_request_functions(self):
     # before_first_request是否执行完毕
     if self._got_first_request:
         return
-    # 处理before_first_request时先加锁，我也不知道为啥要加锁`_`
+    # 处理before_first_request时先加锁，防止before_first_request被多次处理
     with self._before_request_lock:
         if self._got_first_request:
             return
@@ -121,6 +121,7 @@ def try_trigger_before_first_request_functions(self):
 ```
 那么，所有的before_first_request函数是怎么被加入到before_first_request_funcs中的呢？
 请看before_first_request的源码：
+
 ```python
 @setupmethod
 def before_first_request(self, f):
@@ -130,6 +131,7 @@ def before_first_request(self, f):
 ```
 接下来执行request_started.send(self)触发request_started信号  
 触发信号机制后，执行rv = self.preprocess_request()：
+
 ```python
 def preprocess_request(self):
     # 获取request请求的蓝图
@@ -237,5 +239,9 @@ def process_response(self, response):
 回到finalize_request继续执行request_finished.send(self, response=response)，  
 触发request_finished信号，请求结束  
 第二阶段遗留问题：
-1. 为什么处理before_first_request函数时需要加锁？而处理before_request函数却不需要？  
+
 2. RequestContext中为什么也会有after_request函数，它是在哪里定义的？以及它是用来干啥的？
+
+问题解答：
+
+1. 因为我们可能需要对某个请求做特殊的处理，比如某个请求请求完后，我们需要将返回的格式设置为application/json，那么我们可以在RequestContext的after_request中进行处理
